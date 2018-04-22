@@ -5,16 +5,24 @@
   
 
   
-  <title>记得的博客</title>
+  <title>记一次webpack构建优化 | 记得的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="keywords" content="记得的博客，前端开发博客，前端开发简历，前端工程师，前端">
-<meta property="og:type" content="website">
-<meta property="og:title" content="记得的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。 webpack Analyze我用的是webpack的官方分析工具Analyze，使用它之前，你需要先生成一份包含关于模块的统计数据的json文件，你可以参照这篇文档，如果你使用的是Node APi，那么你可能需要参考这篇文档。 将生成好的json文件上传至Analyze，你会看">
+<meta name="keywords" content="webpack,优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次webpack构建优化">
+<meta property="og:url" content="http://yoursite.com/2018/04/22/buileOptimize/index.html">
 <meta property="og:site_name" content="记得的博客">
+<meta property="og:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。 webpack Analyze我用的是webpack的官方分析工具Analyze，使用它之前，你需要先生成一份包含关于模块的统计数据的json文件，你可以参照这篇文档，如果你使用的是Node APi，那么你可能需要参考这篇文档。 将生成好的json文件上传至Analyze，你会看">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/01.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/02.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/03.jpg">
+<meta property="og:updated_time" content="2018-04-22T05:46:41.292Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="记得的博客">
+<meta name="twitter:title" content="记一次webpack构建优化">
+<meta name="twitter:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。 webpack Analyze我用的是webpack的官方分析工具Analyze，使用它之前，你需要先生成一份包含关于模块的统计数据的json文件，你可以参照这篇文档，如果你使用的是Node APi，那么你可能需要参考这篇文档。 将生成好的json文件上传至Analyze，你会看">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/22/buileOptimize/01.jpg">
   
     <link rel="alternate" href="/atom.xml" title="记得的博客" type="application/atom+xml">
   
@@ -61,9 +69,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-buileOptimize" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-buileOptimize" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/22/buileOptimize/" class="article-date">
   <time datetime="2018-04-22T02:47:50.000Z" itemprop="datePublished">2018-04-22</time>
@@ -80,8 +86,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/22/buileOptimize/">记一次webpack构建优化</a>
+    <h1 class="article-title" itemprop="name">
+      记一次webpack构建优化
     </h1>
   
 
@@ -118,57 +124,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-helloWorld" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/15/helloWorld/" class="article-date">
-  <time datetime="2018-04-15T07:52:08.000Z" itemprop="datePublished">2018-04-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/随笔/">随笔</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/15/helloWorld/">Hello Hexo</a>
-    </h1>
+    <a href="/2018/04/15/helloWorld/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello Hexo</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>去年买的搬瓦工的服务器，因为到期了太久没有续费，已经被厂商关闭了，部署在上面的博客自然也访问不到了。也没有心思把它再重新搭建起来，天知道我当初搭建它时查了多少文章。[笑哭]</p>
-<p>但话又说回来了，博客是coder的脸面，没有的话又有点说不过去，只好另辟蹊径，找到了Hexo。</p>
-<h2 id="说说Hexo"><a href="#说说Hexo" class="headerlink" title="说说Hexo"></a>说说Hexo</h2><p>Hexo的使用体验是简单 + 愉快的，基本上跟着<a href="https://hexo.io/zh-cn/docs/index.html" target="_blank" rel="noopener">官方教程</a>敲一遍就能上手，书写方面采用的是MarkDown，学起来也很快。部署方面也很简单，将写好的文章传到服务器上就可以了（就你废话多）。这里我还参考了<a href="https://zhuanlan.zhihu.com/p/26625249" target="_blank" rel="noopener">知乎的一篇文章</a>。</p>
-<p>从想法萌生到新博客诞生，整个过程算下来不到2个小时，还是挺快的。让人心情预愉悦^ ^</p>
-<p>今天就先到这了~</p>
-<p>以上。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/15/helloWorld/" data-id="cjgaa364d0001acgh8cfwljln" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-
 
 </section>
         
