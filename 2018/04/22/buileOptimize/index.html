@@ -7,21 +7,21 @@
   
   <title>记一次webpack构建优化 | 记得的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。">
+  <meta name="description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。我通过使用webpack的官方分析工具，优化了项目构建逻辑，使构建后的平均文件的size减少了50kb，部分文件的size减少了100kb。">
 <meta name="keywords" content="webpack,优化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次webpack构建优化">
 <meta property="og:url" content="http://yoursite.com/2018/04/22/buileOptimize/index.html">
 <meta property="og:site_name" content="记得的博客">
-<meta property="og:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。">
+<meta property="og:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。我通过使用webpack的官方分析工具，优化了项目构建逻辑，使构建后的平均文件的size减少了50kb，部分文件的size减少了100kb。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/01.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/02.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/04/22/buileOptimize/03.jpg">
-<meta property="og:updated_time" content="2018-06-11T08:26:51.157Z">
+<meta property="og:updated_time" content="2018-06-11T09:47:54.194Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次webpack构建优化">
-<meta name="twitter:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。">
+<meta name="twitter:description" content="一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。我通过使用webpack的官方分析工具，优化了项目构建逻辑，使构建后的平均文件的size减少了50kb，部分文件的size减少了100kb。">
 <meta name="twitter:image" content="http://yoursite.com/2018/04/22/buileOptimize/01.jpg">
   
     <link rel="alternate" href="/atom.xml" title="记得的博客" type="application/atom+xml">
@@ -87,10 +87,9 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。</p>
+        <p>一次偶然的机会，我知道了webpack有很多可视化工具，可以帮助你分析应用的依赖图表，找出不好的地方，让你去优化他们。我通过使用webpack的官方分析工具，优化了项目构建逻辑，使构建后的平均文件的size减少了50kb，部分文件的size减少了100kb。</p>
 <a id="more"></a> 
-<p>先说结果，优化后平均文件的size<strong>减少了50kb</strong>，部分文件的size<strong>减少了100kb</strong>。</p>
-<h2 id="webpack-Analyze"><a href="#webpack-Analyze" class="headerlink" title="webpack Analyze"></a>webpack Analyze</h2><p>我用的是webpack的官方分析工具<a href="https://webpack.github.io/analyse/" target="_blank" rel="noopener">Analyze</a>，使用它之前，你需要先生成一份<strong>包含关于模块的统计数据的json文件</strong>，你可以参照<a href="https://doc.webpack-china.org/api/stats/#src/components/Sidebar/Sidebar.jsx" target="_blank" rel="noopener">这篇文档</a>，如果你使用的是Node APi，那么你可能需要参考<a href="https://doc.webpack-china.org/api/node/#stats-%E5%AF%B9%E8%B1%A1-stats-object-" target="_blank" rel="noopener">这篇文档</a>。</p>
+<h2 id="webpack-Analyze"><a href="#webpack-Analyze" class="headerlink" title="webpack Analyze"></a>webpack Analyze</h2><p>这是webpack的官方分析工具<a href="https://webpack.github.io/analyse/" target="_blank" rel="noopener">Analyze</a>，使用它之前，你需要先生成一份<strong>包含关于模块的统计数据的json文件</strong>，你可以参照<a href="https://doc.webpack-china.org/api/stats/#src/components/Sidebar/Sidebar.jsx" target="_blank" rel="noopener">这篇文档</a>，如果你使用的是Node APi，那么你可能需要参考<a href="https://doc.webpack-china.org/api/node/#stats-%E5%AF%B9%E8%B1%A1-stats-object-" target="_blank" rel="noopener">这篇文档</a>。</p>
 <p>将生成好的json文件上传至Analyze，你会看到如下图所示界面。这是你应用的构建概览。你可以在Modules，Chunks，Assets目录里看见更详细的报告，也可以在Hints目录里查看优化提示。</p>
 <img src="/2018/04/22/buileOptimize/01.jpg" title="Analyze Home">
 <h2 id="大量module被多个chunks依赖"><a href="#大量module被多个chunks依赖" class="headerlink" title="大量module被多个chunks依赖"></a>大量module被多个chunks依赖</h2><p>让我们回到主题，点击Hints我发现，在我的应用中有很多个module被多个chunk依赖，这使得我chunk的尺寸比预期要大，会使页面访问速度变慢。我感到很奇怪？我的项目是用Vue-cli生成的，项目里配置了webpack的CommonsChunkPlugin插件，按理说这些被多个chunk依赖的module是会被打包进一个公共文件才对的。为什么这些module没有被打包进公共文件？问题出在哪？</p>
