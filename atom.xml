@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-06-11T09:47:54.194Z</updated>
+  <updated>2018-07-21T08:28:41.756Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>编写文字样式时，行高带来的影响</title>
+    <link href="http://yoursite.com/2018/07/21/web-lineheight-and-ps-lineheight/"/>
+    <id>http://yoursite.com/2018/07/21/web-lineheight-and-ps-lineheight/</id>
+    <published>2018-07-21T06:10:12.000Z</published>
+    <updated>2018-07-21T08:28:41.756Z</updated>
+    
+    <content type="html"><![CDATA[<p>当我们在编写文字样式时，明明是按照设计给的标注写的样式，但文字的间距，却可能会大于设计搞。这一现象，是受文字的行高属性影响导致的。</p><a id="more"></a> <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>列如，下图1是我随便找的一个标注，下图2是我根据标注写的页面。经手工测量，两行文字的间距为36px，明显超出标注里的11px。</p><img src="/2018/07/21/web-lineheight-and-ps-lineheight/1.jpg" title="标注"><p style="text-align: center"><i>图1</i></p><img src="/2018/07/21/web-lineheight-and-ps-lineheight/2.jpg" title="页面截图"><p style="text-align: center"><i>图2</i></p><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>造成这一现象的原因是：浏览器不像ps，不是以文字的实际大小计算外边距，而是以文字的盒模型的大小计算外边距。打开浏览器调试工具我们可以发现，文字外边距是从文字盒模型的底部开始计算的。</p><p>由此可以得出，两行文字间的实际距离等于【第一行文字底部到他的盒模型底部的距离】加上【外边距】加上【第二行文字头部到盒模型头部的距离】。所以当我们按照标注给的值设置外边距时，实际外边距会大于设计稿的外边距。 </p><p>文字的盒模型会被文字行高撑开，行高越大，盒模型越大，偏差也就越大。</p><img src="/2018/07/21/web-lineheight-and-ps-lineheight/3.jpg" title="调试工具截图"><p style="text-align: center"><i>图3</i></p><h2 id="怎么解决"><a href="#怎么解决" class="headerlink" title="怎么解决"></a>怎么解决</h2><p>怎么解决？方法有三：</p><h3 id="方法一：将行高设置为1"><a href="#方法一：将行高设置为1" class="headerlink" title="方法一：将行高设置为1"></a>方法一：将行高设置为1</h3><p>将行高设置成1后，文字大小与盒模型大小相等，【第一行文字底部到他的盒模型底部的距离】、【第二行文字头部到盒模型头部的距离】这两个值为0，两行文字间的间距就等于设置的外边距（参考第二段的公式理解）。 <strong>此方法仅适用于单行文字</strong></p><h3 id="方法二：手动计算外边距"><a href="#方法二：手动计算外边距" class="headerlink" title="方法二：手动计算外边距"></a>方法二：手动计算外边距</h3><p>我们知道，文字间的间距由3部分组成，因此我们可以手动计算出外边距值。 例如（假定设计稿中）第一行文字的大小为16px，第二行文字的大小为12px，他们的间距是20px。假定行高为1.5。那么实际设定的外边距值就是：20 - (16 * 1.5 - 16) / 2 - (12 * 1.5 - 12) / 2 = 13(px)。</p><p>ps：文字的盒模型大小 = 文字大小 * 文字行高<br>ps：文字底部到他的盒模型底部的距离 = (文字大小 * 文字行高 - 文字大小) / 2</p><h3 id="方法三：UI标注时连带着行高一起标注"><a href="#方法三：UI标注时连带着行高一起标注" class="headerlink" title="方法三：UI标注时连带着行高一起标注"></a>方法三：UI标注时连带着行高一起标注</h3><p>详见<a href="https://www.jianshu.com/p/55f1d2c9a82e" target="_blank" rel="noopener">这篇文章</a></p><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>本文分析了实际开发中，文字的间距可能与设计稿不一致的现象及原因，并提供了三个解决方案，希望对你有所帮助。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;当我们在编写文字样式时，明明是按照设计给的标注写的样式，但文字的间距，却可能会大于设计搞。这一现象，是受文字的行高属性影响导致的。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="css" scheme="http://yoursite.com/categories/css/"/>
+    
+    
+      <category term="解决问题" scheme="http://yoursite.com/tags/%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98/"/>
+    
+  </entry>
   
   <entry>
     <title>记一次webpack构建优化</title>
