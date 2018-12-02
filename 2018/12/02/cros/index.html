@@ -21,7 +21,9 @@
 <meta property="og:image" content="http://yoursite.com/2018/12/02/cros/04.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/02/cros/06.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/02/cros/07.png">
-<meta property="og:updated_time" content="2018-12-02T11:29:14.190Z">
+<meta property="og:image" content="http://yoursite.com/2018/12/02/cros/09.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/02/cros/08.png">
+<meta property="og:updated_time" content="2018-12-02T11:35:30.280Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="跨域资源共享">
 <meta name="twitter:description" content="跨域请求是前端开发时经常遇到的一个场景，以前总是遇到了跨域报错就去谷歌，没有系统的去了解，趁着周末有空，专门去研究了下。">
@@ -100,7 +102,7 @@
       
         <p>跨域请求是前端开发时经常遇到的一个场景，以前总是遇到了跨域报错就去谷歌，没有系统的去了解，趁着周末有空，专门去研究了下。</p>
 <a id="more"></a> 
-<h2 id="Cross-Origin-Resource-Sharing-CORS"><a href="#Cross-Origin-Resource-Sharing-CORS" class="headerlink" title="Cross-Origin Resource Sharing(CORS)"></a>Cross-Origin Resource Sharing(CORS)</h2><p>前端的跨域请求的实现都是建立在跨域资源共享（CORS）这套机制上的，那么什么是跨域资源共享呢？</p>
+<h2 id="什么是跨域资源共享（Cross-Origin-Resource-Sharing）"><a href="#什么是跨域资源共享（Cross-Origin-Resource-Sharing）" class="headerlink" title="什么是跨域资源共享（Cross-Origin Resource Sharing）"></a>什么是跨域资源共享（Cross-Origin Resource Sharing）</h2><p>前端的跨域请求的实现都是建立在跨域资源共享（CORS）这套机制上的，那么什么是跨域资源共享呢？</p>
 <p>跨域资源共享是一套机制，它通过额外的HTTP头来告诉浏览器，让一个源(origin)上的web应用有权限去访问不同源(diffent origin)上的资源；当一个web应用去请求与它不同源(origin)上的资源时，它会发出一个跨域请求(cross-origin Http Request)。</p>
 <p>ps: 同源的定义：如果两个页面的协议，端口，域名相同，则两个页面拥有相同的源；若协议、端口、域名有一个不相同，则不同源。</p>
 <h2 id="功能概述"><a href="#功能概述" class="headerlink" title="功能概述"></a>功能概述</h2><p>跨域资源共享新增了一组HTTP头部字段，服务器使用这些头部字段来描述哪些源被允许通过浏览器来读取资源；另外，对于那些可能对服务器数据产生副作用的HTTP请求方法（特别是GET以外的请求方法，或者是搭配某些MIME类型的POST请求），浏览器必须先发送一个方法为OPTIONS的预检请求（preflight request），来读取服务器支持的请求方法。在得到服务器“批准”后，才会发送实际的请求。服务器也可以通知客户端，是否需要携带身份凭证（包括Cookie和HTTP认证相关数据）。</p>
@@ -122,9 +124,9 @@
 <p>请求头中的<code>Access-Control-Request-Headers: x-custom-field</code>指明了额外添加的头部字段，响应头中的<code>Access-Control-Allow-Headers: x-custom-field</code>指明了允许添加的头部字段。</p>
 <p>若服务器没有返回<code>Access-Control-Request-Headers</code>或返回的值与真实的请求方法中添加的其他头部字段不匹配。浏览器则不会发送真实的请求，如下图所示。</p>
 <img src="/2018/12/02/cros/07.png" title="预检请求-4">
-<h4 id="携带身份凭证的请求"><a href="#携带身份凭证的请求" class="headerlink" title="携带身份凭证的请求"></a>携带身份凭证的请求</h4>
+<h4 id="携带身份凭证的请求"><a href="#携带身份凭证的请求" class="headerlink" title="携带身份凭证的请求"></a>携带身份凭证的请求</h4><img src="/2018/12/02/cros/09.png" title="XMLHttpRequest设置">
 <p>一般而言，对于跨域请求，浏览器<strong>不会</strong>携带身份凭证信息，例如Cookie，如果要携带身份凭证信息，则需要将<code>XMLHttpRequest</code>的<code>withCredentials</code>属性设置为true</p>
-
+<img src="/2018/12/02/cros/08.png" title="携带身份凭证的请求">
 <p>相应的，服务器也得将<code>Access-Control-Allow-Credentials</code>为<code>true</code>，不然浏览器将不会把响应的内容返回给请求者；同时<code>Access-Control-Allow-Origin</code>不能设置成通配符<code>*</code>，必须指定具体的<code>origin</code>才行。</p>
 <h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>除了上述介绍的一些头部字段以外，还有个常用的头部字段，<code>Access-Control-Max-Age</code>，它指定了preflight请求的结果能够被缓存多久。语法如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Max-Age: &lt;delta-seconds&gt;</span><br></pre></td></tr></table></figure>
