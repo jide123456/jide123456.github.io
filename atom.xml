@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-07-21T08:56:18.247Z</updated>
+  <updated>2018-12-02T11:29:14.190Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>跨域资源共享</title>
+    <link href="http://yoursite.com/2018/12/02/cros/"/>
+    <id>http://yoursite.com/2018/12/02/cros/</id>
+    <published>2018-12-02T08:16:23.000Z</published>
+    <updated>2018-12-02T11:29:14.190Z</updated>
+    
+    <content type="html"><![CDATA[<p>跨域请求是前端开发时经常遇到的一个场景，以前总是遇到了跨域报错就去谷歌，没有系统的去了解，趁着周末有空，专门去研究了下。</p><a id="more"></a> <h2 id="Cross-Origin-Resource-Sharing-CORS"><a href="#Cross-Origin-Resource-Sharing-CORS" class="headerlink" title="Cross-Origin Resource Sharing(CORS)"></a>Cross-Origin Resource Sharing(CORS)</h2><p>前端的跨域请求的实现都是建立在跨域资源共享（CORS）这套机制上的，那么什么是跨域资源共享呢？</p><p>跨域资源共享是一套机制，它通过额外的HTTP头来告诉浏览器，让一个源(origin)上的web应用有权限去访问不同源(diffent origin)上的资源；当一个web应用去请求与它不同源(origin)上的资源时，它会发出一个跨域请求(cross-origin Http Request)。</p><p>ps: 同源的定义：如果两个页面的协议，端口，域名相同，则两个页面拥有相同的源；若协议、端口、域名有一个不相同，则不同源。</p><h2 id="功能概述"><a href="#功能概述" class="headerlink" title="功能概述"></a>功能概述</h2><p>跨域资源共享新增了一组HTTP头部字段，服务器使用这些头部字段来描述哪些源被允许通过浏览器来读取资源；另外，对于那些可能对服务器数据产生副作用的HTTP请求方法（特别是GET以外的请求方法，或者是搭配某些MIME类型的POST请求），浏览器必须先发送一个方法为OPTIONS的预检请求（preflight request），来读取服务器支持的请求方法。在得到服务器“批准”后，才会发送实际的请求。服务器也可以通知客户端，是否需要携带身份凭证（包括Cookie和HTTP认证相关数据）。</p><h3 id="若干访问场景"><a href="#若干访问场景" class="headerlink" title="若干访问场景"></a>若干访问场景</h3><p>概念上的东西总是让人晕乎乎的，下面我们通过三个场景来具体了解下吧。</p><h4 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h4><p>简单请求是指不会出发CORS预检的请求，一般<code>GET</code>请求，<code>POST</code>请求都可以看作是简单请求，它的请求头与响应头如下：</p><img src="/2018/12/02/cros/01.png" title="简单请求-1"><p>请求头中的<code>Origin</code>字段指明请求是从哪个源发起的，响应头中的<code>Access-Control-Allow-Origin</code>字段指明哪些源有权限访问，*代表该资源可以被所任意源访问。</p><p>若只想某一源可以访问，服务器的头部字段可以这么设定：</p><p><code>Access-Control-Allow-Origin: http://localhost:8080</code></p><p>若服务器没有返回<code>Access-Control-Allow-Origin</code>或返回的值与浏览器所在源不匹配。则浏览器会阻止脚本继续运行，如下图所示。</p><img src="/2018/12/02/cros/02.png" title="简单请求-2"><h4 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h4><p>与简单请求对立的是预检请求，他会在实际的请求发送前先去发送一个方法为<code>OPTIONS</code>的预检请求，来询问服务器是否允许该实际请求。”预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。</p><p>当请求方法是<code>PUT</code>，<code>DELETE</code>，<code>CONNECT</code>，<code>OPTIONS</code>，<code>TRACE</code>，<code>PATCH</code>之一，或者请求方法是<code>POST</code>，但人为添加了其他头部字段时，浏览器会先发送一个预检请求。</p><h5 id="让我们来发送一个PUT请求看看："><a href="#让我们来发送一个PUT请求看看：" class="headerlink" title="让我们来发送一个PUT请求看看："></a>让我们来发送一个PUT请求看看：</h5><img src="/2018/12/02/cros/03.png" title="预检请求-1"><p>可以看到，在PUT请求发送前，浏览器发送了一个OPTIONS请求；（OPTIONS请求的）请求头中的<code>Access-Control-Request-Method: PUT</code>指明真实的请求是一个<code>PUT</code>请求。响应头中的<code>Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS</code>指明服务器允许使用这些请求方法。预检通过，浏览器发送真实请求，皆大欢喜。</p><p>若服务器没有返回<code>Access-Control-Allow-Methods</code>或返回的值与真实的请求方法不匹配。浏览器则不会发送真实的请求，如下图所示。</p><img src="/2018/12/02/cros/04.png" title="预检请求-2"><h5 id="让我们来发送一个人为添加了其他头部字段的POST请求看看："><a href="#让我们来发送一个人为添加了其他头部字段的POST请求看看：" class="headerlink" title="让我们来发送一个人为添加了其他头部字段的POST请求看看："></a>让我们来发送一个人为添加了其他头部字段的POST请求看看：</h5><img src="/2018/12/02/cros/06.png" title="预检请求-3"><p>请求头中的<code>Access-Control-Request-Headers: x-custom-field</code>指明了额外添加的头部字段，响应头中的<code>Access-Control-Allow-Headers: x-custom-field</code>指明了允许添加的头部字段。</p><p>若服务器没有返回<code>Access-Control-Request-Headers</code>或返回的值与真实的请求方法中添加的其他头部字段不匹配。浏览器则不会发送真实的请求，如下图所示。</p><img src="/2018/12/02/cros/07.png" title="预检请求-4"><h4 id="携带身份凭证的请求"><a href="#携带身份凭证的请求" class="headerlink" title="携带身份凭证的请求"></a>携带身份凭证的请求</h4><p>一般而言，对于跨域请求，浏览器<strong>不会</strong>携带身份凭证信息，例如Cookie，如果要携带身份凭证信息，则需要将<code>XMLHttpRequest</code>的<code>withCredentials</code>属性设置为true</p><p>相应的，服务器也得将<code>Access-Control-Allow-Credentials</code>为<code>true</code>，不然浏览器将不会把响应的内容返回给请求者；同时<code>Access-Control-Allow-Origin</code>不能设置成通配符<code>*</code>，必须指定具体的<code>origin</code>才行。</p><h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>除了上述介绍的一些头部字段以外，还有个常用的头部字段，<code>Access-Control-Max-Age</code>，它指定了preflight请求的结果能够被缓存多久。语法如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Max-Age: &lt;delta-seconds&gt;</span><br></pre></td></tr></table></figure><p>另外，关于简单请求和预检请求的判定，上文中只是简单的讲述了下，更加全面的规则<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS#%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82" target="_blank" rel="noopener">请看这里</a></p><p>以上。</p><p>本文参考：</p><ul><li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="noopener">HTTP访问控制（CORS）</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;跨域请求是前端开发时经常遇到的一个场景，以前总是遇到了跨域报错就去谷歌，没有系统的去了解，趁着周末有空，专门去研究了下。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="http" scheme="http://yoursite.com/categories/http/"/>
+    
+    
+      <category term="cros" scheme="http://yoursite.com/tags/cros/"/>
+    
+  </entry>
   
   <entry>
     <title>编写文字样式时，行高带来的影响</title>
