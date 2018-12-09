@@ -17,7 +17,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/12/09/what-is-jsonp/1.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/09/what-is-jsonp/2.gif">
-<meta property="og:updated_time" content="2018-12-09T10:10:37.695Z">
+<meta property="og:updated_time" content="2018-12-09T10:12:45.092Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="说说jsonp">
 <meta name="twitter:description" content="说起jsonp，直到一周前，我对它的认识还停留在请求地址末尾拼接上?callback=callback就能解决跨域问题，以及知道怎么通过原生js去发送一个jsonp请求。上周我研究CORS时顺带去了解了下jsonp的原理，对它的认识才更进一步。">
@@ -97,9 +97,9 @@
         <p>说起jsonp，直到一周前，我对它的认识还停留在请求地址末尾拼接上<code>?callback=callback</code>就能解决跨域问题，以及知道怎么通过原生js去发送一个jsonp请求。上周我研究<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="noopener">CORS</a>时顺带去了解了下jsonp的原理，对它的认识才更进一步。</p>
 <a id="more"></a> 
 <h2 id="jsonp原理"><a href="#jsonp原理" class="headerlink" title="jsonp原理"></a>jsonp原理</h2><p>我们知道，限于<a href="https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy" target="_blank" rel="noopener">同源政策</a>，在脚本内发送的跨域请求会被浏览器限制。但是，通过script标签去请求不同源上的脚本文件，却不会被浏览器限制。</p>
-<p>再详细点说明就是，对于一个不同源的接口<code>//domain.com/api/list</code>，这样请求会被限制。</p>
+<p>再详细点说明就是，对于一个不同源的接口<code>//domain.com/api/list</code>，这样请求会被限制：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">	type: <span class="string">'get'</span>,</span><br><span class="line">	url: <span class="string">'//domain.com/api/list'</span>,</span><br><span class="line">	data: &#123;</span><br><span class="line">		currPage: <span class="number">1</span>,</span><br><span class="line">		pageSize: <span class="number">10</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>而这么请求缺不会被限制。</p>
+<p>而这么请求却不会被限制：</p>
 <p><code>&lt;script src=&quot;//domain.com/api/list?currPage=1&amp;pageSize=10&amp;callback=callback&quot;&gt;&lt;/script&gt;</code></p>
 <p>我们可以把一次ajax请求流程拆分成两个步骤看待，一步是【发送请求】，一步是【接受响应数据并执行回调】。对于一个跨域请求，【发送请求】的步骤我们已经实现了，再实现【接受响应数据并执行回调】，我们就完成了一次跨域请求了！让我们来看看第二步应该怎么实现。</p>
 <p>当服务器查询好数据打算返回给浏览器时，需要做一下“特殊”的处理：</p>
