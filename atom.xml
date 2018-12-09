@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-12-09T08:37:32.702Z</updated>
+  <updated>2018-12-09T10:02:31.479Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>说说jsonp</title>
+    <link href="http://yoursite.com/2018/12/09/what-is-jsonp/"/>
+    <id>http://yoursite.com/2018/12/09/what-is-jsonp/</id>
+    <published>2018-12-09T08:41:29.000Z</published>
+    <updated>2018-12-09T10:02:31.479Z</updated>
+    
+    <content type="html"><![CDATA[<p>说起jsonp，直到一周前，我对它的认识还停留在请求地址末尾拼接上<code>?callback=callback</code>就能解决跨域问题，以及知道怎么通过原生js去发送一个jsonp请求。上周我研究<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="noopener">CORS</a>时顺带去了解了下jsonp的原理，对它的认识才更进一步。</p><a id="more"></a> <h2 id="jsonp原理"><a href="#jsonp原理" class="headerlink" title="jsonp原理"></a>jsonp原理</h2><p>我们知道，限于<a href="https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy" target="_blank" rel="noopener">同源政策</a>，在脚本内发送的跨域请求会被浏览器限制。但是，通过script标签去请求不同源上的脚本文件，却不会被浏览器限制。</p><p>再详细点说明就是，对于一个不同源的接口<code>//domain.com/api/list</code>，这样请求会被限制。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">type: <span class="string">'get'</span>,</span><br><span class="line">url: <span class="string">'//domain.com/api/list'</span>,</span><br><span class="line">data: &#123;</span><br><span class="line">currPage: <span class="number">1</span>,</span><br><span class="line">pageSize: <span class="number">10</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><p>而这么请求缺不会被限制。</p><p><code>&lt;script src=&quot;//domain.com/api/list?currPage=1&amp;pageSize=10&amp;callback=callback&quot;&gt;&lt;/script&gt;</code></p><p>我们可以把一次ajax请求流程拆分成两个步骤看待，一步是【发送请求】，一步是【接受响应数据并执行回调】。对于一个跨域请求，【发送请求】的步骤我们已经实现了，再实现【接受响应数据并执行回调】，我们就完成了一次跨域请求了！让我们来看看第二步应该怎么实现。</p><p>当服务器查询好数据打算返回给浏览器时，需要做一下“特殊”的处理：</p><p>1、从请求参数中读取回调函数名称，这个字段通常是前后端约定好了的。</p><p>2、将数据填充到回调函数里</p><p><code>callback({&quot;name&quot;: &quot;小明&quot;, &quot;id&quot;: 1823})</code></p><p>3、将响应头的<code>Content-Type</code>设置成<code>application/javascript</code>，只有这样数据才会被我们预期的那样使用，别忘了，我们是通过script标签去请求的接口。</p><p>服务器做完这些工作，请求就能按照我们预期的那样被使用啦。接下来是<strong>show me the code</strong>环节。</p><p>浏览器端代码：</p><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">callback</span> (<span class="params">data</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">alert(<span class="built_in">JSON</span>.stringify(data))</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://localhost:3333/api/jsonp?callback=callback"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure><p>服务器端代码(Koa)：</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">exports.jsonp = <span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 读取回调函数名称</span></span><br><span class="line">  <span class="keyword">let</span> callbackName = ctx.request.url.match(<span class="regexp">/callback=(\w+)/</span>)[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 查询数据</span></span><br><span class="line">  <span class="keyword">let</span> data = <span class="built_in">JSON</span>.stringify(&#123;<span class="attr">name</span>: <span class="string">'小明'</span>, <span class="attr">id</span>: <span class="number">1823</span>, <span class="attr">age</span>: <span class="number">18</span>&#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 设置响应头</span></span><br><span class="line">  ctx.set(<span class="string">'Content-Type'</span>, <span class="string">'application/javascript'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 返回数据</span></span><br><span class="line">  ctx.response.body = <span class="string">`<span class="subst">$&#123;callbackName&#125;</span>(<span class="subst">$&#123;data&#125;</span>)`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>运行结果</p><img src="/2018/12/09/what-is-jsonp/1.png" title="运行结果"><p>总结一下：jsonp的原理就是，浏览器通过script标签去请求一个不同源上的接口，服务器将数据接口填充进回调函数里返回给浏览器。</p><h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>jsonp的优势在于它的兼容性，毕竟是早些时代的产物，兼容性没得说。缺点是只支持<code>GET</code>方法，有点膈应。如果不是产品用户群体特殊，还是尽早使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="noopener">CORS</a>。</p><h2 id="佩服佩服"><a href="#佩服佩服" class="headerlink" title="佩服佩服"></a>佩服佩服</h2><p>了解完jsonp的原理后，只想感慨人民群众的智慧是伟大的，这种法子都能想的出来，佩服佩服。</p><img src="/2018/12/09/what-is-jsonp/2.gif" title="运行结果"><p>以上。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;说起jsonp，直到一周前，我对它的认识还停留在请求地址末尾拼接上&lt;code&gt;?callback=callback&lt;/code&gt;就能解决跨域问题，以及知道怎么通过原生js去发送一个jsonp请求。上周我研究&lt;a href=&quot;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CORS&lt;/a&gt;时顺带去了解了下jsonp的原理，对它的认识才更进一步。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="js" scheme="http://yoursite.com/categories/js/"/>
+    
+      <category term="http" scheme="http://yoursite.com/categories/js/http/"/>
+    
+    
+      <category term="jsonp" scheme="http://yoursite.com/tags/jsonp/"/>
+    
+  </entry>
   
   <entry>
     <title>跨域资源共享</title>
